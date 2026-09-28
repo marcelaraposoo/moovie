@@ -12,6 +12,7 @@ from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.cache import query_cache
 from app.movies import repository
 from app.movies.models import DimMovie, DimReview, MovieReview
 from app.movies.repository import DIRETOR
@@ -65,8 +66,12 @@ def to_detail(movie: DimMovie) -> dict:
 async def list_movies(
     db: AsyncSession, *, page: int, size: int, q: str | None, genero: str | None
 ) -> tuple[list[dict], int]:
-    movies, total = await repository.find_page(db, page=page, size=size, q=q, genero=genero)
-    return [to_list_item(m) for m in movies], total
+    async def load() -> tuple[list[dict], int]:
+        movies, total = await repository.find_page(db, page=page, size=size, q=q, genero=genero)
+        return [to_list_item(m) for m in movies], total
+
+    key = f"movies:list:{page}:{size}:{q or ''}:{genero or ''}"
+    return await query_cache.get_or_set(key, load)
 
 
 async def get_movie(db: AsyncSession, sk_movie_id: str) -> DimMovie | None:
@@ -74,7 +79,9 @@ async def get_movie(db: AsyncSession, sk_movie_id: str) -> DimMovie | None:
 
 
 async def list_genres(db: AsyncSession) -> list[str]:
-    return await repository.list_genre_names(db)
+    return await query_cache.get_or_set(
+        "movies:genres", lambda: repository.list_genre_names(db)
+    )
 
 
 async def create_movie(db: AsyncSession, payload: MovieCreate) -> DimMovie:
@@ -94,6 +101,7 @@ async def create_movie(db: AsyncSession, payload: MovieCreate) -> DimMovie:
     movie.reviews_summary = DimReview(qtd_avaliacoes_usuarios=0, nota_media_usuarios=None)
 
     await repository.save(db, movie)
+    query_cache.clear()
     return await repository.find_by_id(db, movie.sk_movie_id)  # type: ignore[return-value]
 
 
@@ -111,18 +119,22 @@ async def update_movie(db: AsyncSession, movie: DimMovie, payload: MovieUpdate) 
     movie.genres = [await repository.get_or_create_genre(db, nome) for nome in payload.generos]
 
     await repository.save(db, movie)
+    query_cache.clear()
     return await repository.find_by_id(db, movie.sk_movie_id)  # type: ignore[return-value]
 
 
 async def delete_movie(db: AsyncSession, movie: DimMovie) -> None:
     await repository.delete(db, movie)
+    query_cache.clear()
 
 
 async def add_review(db: AsyncSession, movie: DimMovie, payload: ReviewCreate) -> MovieReview:
-    return await repository.add_review_row(
+    review = await repository.add_review_row(
         db,
         movie,
         nome=payload.nome.strip(),
         nota=payload.nota,
         comentario=payload.comentario.strip(),
     )
+    query_cache.clear()
+    return review

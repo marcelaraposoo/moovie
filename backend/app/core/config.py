@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     secret_key: str = "dev-secret-troque-em-producao"
     cookie_secure: bool = False
+    cache_ttl_seconds: int = 60
 
 
 @lru_cache

@@ -2,11 +2,16 @@ from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.cache import query_cache
 from app.stats import repository
 from app.stats.schemas import DashboardStats, DecadeCount, GenreCount
 
 
 async def get_dashboard_stats(db: AsyncSession) -> DashboardStats:
+    return await query_cache.get_or_set("stats:dashboard", lambda: _compute_stats(db))
+
+
+async def _compute_stats(db: AsyncSession) -> DashboardStats:
     total_filmes = await repository.count_movies(db)
     total_avaliacoes = await repository.count_reviews(db)
     nota_media_geral = await repository.average_rating(db)

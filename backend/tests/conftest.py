@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.auth import models as auth_models  # noqa: F401  Registra admin_users no metadata.
 from app.auth.repository import create as create_admin
+from app.core.cache import query_cache
 from app.core.security import hash_password
 from app.db.base import Base
 from app.db.session import get_db
@@ -22,6 +23,10 @@ ADMIN_SENHA = "senha-teste-123"
 @pytest.fixture
 async def anonymous_client():
     """Cliente HTTP SEM login, contra um banco em memória com 1 admin já cadastrado."""
+
+    # o cache é global do processo: sem limpar, o resultado guardado por um
+    # teste (com outro banco em memória) vazaria para o teste seguinte.
+    query_cache.clear()
 
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
     async with engine.begin() as conn:
@@ -45,6 +50,7 @@ async def anonymous_client():
         yield ac
 
     app.dependency_overrides.clear()
+    query_cache.clear()
     await engine.dispose()
 
 
