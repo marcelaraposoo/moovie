@@ -130,7 +130,7 @@ Base: `/api/v1` · 🔒 = exige login do Administrador
 ## 💡 Decisões técnicas
 
 - **Nota de 0 a 10**, a mesma escala do banco (`movie_reviews.nota`).
-- **Média de avaliações** mantida em `dim_reviews` e atualizada a cada nova avaliação, sem recalcular tudo a cada leitura.
+- **Nota média e quantidade de avaliações** calculadas a partir das avaliações realmente registradas em `movie_reviews`, para o número exibido bater sempre com a lista. A tabela `dim_reviews` é mantida em sincronia a cada nova avaliação.
 - **Arquitetura em camadas** no backend: `router → service → repository`, separando rotas, regras de negócio e acesso ao banco.
 - **Autenticação** com cookie `httpOnly` e senha com hash PBKDF2, usando apenas a biblioteca padrão do Python.
 - **Cache** em memória com validade de 60 s para o catálogo, os gêneros e o dashboard. Qualquer alteração (cadastro, edição, remoção ou nova avaliação) limpa o cache. Configurável em `CACHE_TTL_SECONDS` (`0` desliga).

@@ -36,7 +36,22 @@ def _director_name(movie: DimMovie) -> str | None:
     return None
 
 
+def _review_stats(movie: DimMovie) -> tuple[float | None, int]:
+    """Média e quantidade calculadas a partir das avaliações que o filme realmente tem.
+
+    Não usamos o resumo importado (`dim_reviews`) para exibir: nos CSVs da
+    atividade ele não bate com as linhas de `movie_reviews`, o que mostrava
+    "média de 4 avaliações" com apenas 2 listadas.
+    """
+
+    notas = [review.nota for review in movie.reviews]
+    if not notas:
+        return None, 0
+    return sum(notas) / len(notas), len(notas)
+
+
 def to_list_item(movie: DimMovie) -> dict:
+    nota_media, qtd_avaliacoes = _review_stats(movie)
     return {
         "sk_movie_id": movie.sk_movie_id,
         "id_filme": movie.id_filme,
@@ -47,12 +62,8 @@ def to_list_item(movie: DimMovie) -> dict:
         "url_backdrop": movie.url_backdrop,
         "generos": [g.nome_genero for g in movie.genres],
         "diretor": _director_name(movie),
-        "nota_media": (
-            movie.reviews_summary.nota_media_usuarios if movie.reviews_summary else None
-        ),
-        "qtd_avaliacoes": (
-            movie.reviews_summary.qtd_avaliacoes_usuarios if movie.reviews_summary else 0
-        ),
+        "nota_media": nota_media,
+        "qtd_avaliacoes": qtd_avaliacoes,
     }
 
 

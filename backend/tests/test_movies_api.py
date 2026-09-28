@@ -74,3 +74,19 @@ async def test_create_movie_requires_at_least_one_genre(client: httpx.AsyncClien
     payload = {**MOVIE_PAYLOAD, "generos": []}
     response = await client.post("/api/v1/movies", json=payload)
     assert response.status_code == 422
+
+
+async def test_contagem_e_media_batem_com_as_avaliacoes_listadas(client: httpx.AsyncClient) -> None:
+    created = (await client.post("/api/v1/movies", json=MOVIE_PAYLOAD)).json()
+    movie_id = created["sk_movie_id"]
+
+    for nome, nota in [("Ana", 8.0), ("Bia", 6.0)]:
+        await client.post(
+            f"/api/v1/movies/{movie_id}/reviews",
+            json={"nome": nome, "nota": nota, "comentario": "Comentário"},
+        )
+
+    detail = (await client.get(f"/api/v1/movies/{movie_id}")).json()
+    assert len(detail["reviews"]) == 2
+    assert detail["qtd_avaliacoes"] == len(detail["reviews"])
+    assert detail["nota_media"] == 7.0

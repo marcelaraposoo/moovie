@@ -106,15 +106,23 @@ async def add_review_row(
 ) -> MovieReview:
     review = MovieReview(sk_movie_id=movie.sk_movie_id, nome=nome, nota=nota, comentario=comentario)
     db.add(review)
+    await db.flush()
+
+    # mantém `dim_reviews` em sincronia com as avaliações que realmente existem
+    total, media = (
+        await db.execute(
+            select(func.count(), func.avg(MovieReview.nota)).where(
+                MovieReview.sk_movie_id == movie.sk_movie_id
+            )
+        )
+    ).one()
 
     summary = movie.reviews_summary
     if summary is None:
         summary = DimReview(sk_movie_id=movie.sk_movie_id, qtd_avaliacoes_usuarios=0)
         db.add(summary)
-
-    total_pontos = (summary.nota_media_usuarios or 0.0) * summary.qtd_avaliacoes_usuarios
-    summary.qtd_avaliacoes_usuarios += 1
-    summary.nota_media_usuarios = (total_pontos + nota) / summary.qtd_avaliacoes_usuarios
+    summary.qtd_avaliacoes_usuarios = total
+    summary.nota_media_usuarios = media
 
     await db.commit()
     await db.refresh(review)

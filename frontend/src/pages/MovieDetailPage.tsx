@@ -100,7 +100,7 @@ export default function MovieDetailPage() {
               <>
                 <RatingBadge value={movie.nota_media ?? 0} size="lg" />
                 <span className="movie-rating-count">
-                  média de {movie.qtd_avaliacoes} avaliação{movie.qtd_avaliacoes > 1 ? "ões" : ""}
+                  média de {movie.qtd_avaliacoes} {movie.qtd_avaliacoes === 1 ? "avaliação" : "avaliações"}
                 </span>
               </>
             ) : (
