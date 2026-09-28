@@ -7,6 +7,7 @@ export default function Header() {
   const navigate = useNavigate();
   const { isAuthenticated, admin, logout } = useAuth();
   const isCatalog = location.pathname === "/";
+  const isDashboard = location.pathname === "/dashboard";
 
   async function handleLogout() {
     await logout();
@@ -27,6 +28,11 @@ export default function Header() {
           <Link to="/" className={`nav-link ${isCatalog ? "nav-link-active" : ""}`}>
             Catálogo
           </Link>
+          {isAuthenticated && (
+            <Link to="/dashboard" className={`nav-link ${isDashboard ? "nav-link-active" : ""}`}>
+              Dashboard
+            </Link>
+          )}
           {isAuthenticated && (
             <Link to="/filmes/novo" className="btn btn-primary btn-sm">
               Adicionar filme

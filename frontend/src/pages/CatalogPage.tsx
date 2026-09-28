@@ -109,7 +109,13 @@ export default function CatalogPage() {
       <CatalogHero movie={featured} totalFilmes={total} />
 
       <section className="catalog-section">
-        <SearchBar q={q} genero={genero} genres={genres} onSearch={handleSearch} onGenreChange={handleGenreChange} />
+        <SearchBar
+          q={q}
+          genero={genero}
+          genres={genres}
+          onSearch={handleSearch}
+          onGenreChange={handleGenreChange}
+        />
 
         {error && <p className="form-error">{error}</p>}
         {loading && <p className="loading-state">Carregando filmes...</p>}

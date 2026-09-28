@@ -3,6 +3,7 @@ import { AuthProvider } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import Header from "./components/Header";
 import CatalogPage from "./pages/CatalogPage";
+import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
 import MovieFormPage from "./pages/MovieFormPage";
@@ -19,6 +20,14 @@ export default function App() {
           <Routes>
             <Route path="/" element={<CatalogPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/filmes/:id" element={<MovieDetailPage />} />
             <Route
               path="/filmes/novo"

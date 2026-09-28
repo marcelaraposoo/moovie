@@ -1,5 +1,6 @@
 import axios from "axios";
 import type {
+  DashboardStats,
   MovieDetail,
   MovieFormData,
   MovieListItem,
@@ -50,6 +51,11 @@ export async function fetchGenres(): Promise<string[]> {
 
 export async function addReview(movieId: string, payload: ReviewFormData): Promise<void> {
   await api.post(`/movies/${movieId}/reviews`, payload);
+}
+
+export async function fetchDashboard(): Promise<DashboardStats> {
+  const { data } = await api.get<DashboardStats>("/dashboard");
+  return data;
 }
 
 export interface AdminOut {

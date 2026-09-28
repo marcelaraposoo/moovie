@@ -44,6 +44,24 @@ export interface MovieFormData {
   url_backdrop: string | null;
 }
 
+export interface GenreCount {
+  genero: string;
+  quantidade: number;
+}
+
+export interface DecadeCount {
+  decada: number;
+  quantidade: number;
+}
+
+export interface DashboardStats {
+  total_filmes: number;
+  total_avaliacoes: number;
+  nota_media_geral: number | null;
+  generos_mais_comuns: GenreCount[];
+  filmes_por_decada: DecadeCount[];
+}
+
 export interface ReviewFormData {
   nome: string;
   nota: number; // escala 0-10

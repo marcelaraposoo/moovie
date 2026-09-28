@@ -126,6 +126,8 @@ npm run dev
 | DELETE | `/movies/{sk_movie_id}`       | Remove um filme (avaliações são removidas em cascata)   |
 | POST   | `/movies/{sk_movie_id}/reviews` | Adiciona uma avaliação (nota 0–10 + comentário)       |
 | GET    | `/genres`                     | Lista os gêneros já cadastrados (para o filtro da UI)   |
+| GET    | `/dashboard`                  | Estatísticas gerais do catálogo — admin                 |
+| POST   | `/auth/login` · `/auth/logout` · GET `/auth/me` | Sessão do Administrador               |
 
 Documentação interativa (Swagger) em `http://localhost:8000/docs`.
 
@@ -182,6 +184,7 @@ backend/
 │   ├── repository.py       # só acesso a dados (SQLAlchemy)
 │   ├── service.py           # regra de negócio (usa o repository)
 │   └── router.py             # rotas de /movies e /genres
+├── app/stats/               # dashboard: repository/service/router (consultas agregadas)
 ├── app/core/security.py   # hash de senha e token de sessão (stdlib)
 ├── scripts/seed.py         # carga inicial a partir dos CSVs da atividade
 ├── scripts/seed_admin.py    # cria a conta do Administrador
@@ -261,6 +264,14 @@ sem apagar `.git`), basta `git add .`, `git commit` e `git push` normalmente.
 - Testes automatizados (`backend/tests/test_movies_api.py`,
   `backend/tests/test_auth.py` — login, senha errada, rotas protegidas sem
   sessão, logout)
+- **Dashboard** (`/dashboard`, só para o Administrador logado): total de filmes,
+  total de avaliações, nota média geral, gêneros mais comuns e filmes por
+  década — consultas agregadas direto no SQL (`app/stats/`), sem carregar
+  o catálogo inteiro na memória.
+- **Testes do frontend** com Vitest + Testing Library
+  (`frontend/src/components/*.test.tsx`): Pagination, RatingBadge,
+  RatingControl e SearchBar (incluindo o debounce da busca). Rode com
+  `npm test` dentro de `frontend/`.
 - Filtros (busca por título + filtro por gênero)
 - Responsividade (breakpoints em `styles.css`)
 - Busca/filtro/página persistidos na URL (funciona com o botão Voltar do navegador)
@@ -269,7 +280,4 @@ sem apagar `.git`), basta `git add .`, `git commit` e `git push` normalmente.
 
 - Cache da listagem paginada
 - Storybook para os componentes React
-- Testes automatizados do frontend (ex: Vitest + Testing Library)
-- Dashboard com estatísticas (gêneros mais comuns, notas médias por década...)
-- Exportação do catálogo em CSV/JSON
 - Loading skeletons e paginação "infinita" no catálogo

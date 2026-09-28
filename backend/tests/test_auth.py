@@ -1,48 +1,6 @@
 import httpx
-import pytest
-from httpx import ASGITransport
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from app.auth import models as auth_models  # noqa: F401  Registra admin_users no metadata.
-from app.auth.repository import create as create_admin
-from app.core.security import hash_password
-from app.db.base import Base
-from app.db.session import get_db
-from app.main import app
-from app.movies import models  # noqa: F401  Registra as tabelas no metadata.
-
-ADMIN_EMAIL = "admin@teste.com"
-ADMIN_SENHA = "senha-teste-123"
-
-
-@pytest.fixture
-async def anonymous_client():
-    """Cliente HTTP SEM login, contra um banco com um administrador já cadastrado."""
-
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-    test_session_factory = async_sessionmaker(bind=engine, expire_on_commit=False)
-
-    async def override_get_db():
-        async with test_session_factory() as session:
-            yield session
-
-    app.dependency_overrides[get_db] = override_get_db
-
-    async with test_session_factory() as session:
-        await create_admin(
-            session, nome="Admin Teste", email=ADMIN_EMAIL, senha_hash=hash_password(ADMIN_SENHA)
-        )
-
-    transport = ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
-
-    app.dependency_overrides.clear()
-    await engine.dispose()
-
+from tests.conftest import ADMIN_EMAIL, ADMIN_SENHA
 
 MOVIE_PAYLOAD = {
     "titulo": "Duna",
