@@ -57,5 +57,5 @@ jobs:
       - name: Type-check + build (Vite)
         run: npm run build
 
-      - name: Testes (Vitest)
-        run: npm test -- --run
+      # TODO: adicionar testes com Vitest + Testing Library e reativar este
+      # step (ver README.md, seção "Itens de bônus ainda em aberto").

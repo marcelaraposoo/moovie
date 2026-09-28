@@ -154,9 +154,11 @@ def _dedupe_unique_value(table_name: str, column_name: str, value: str) -> str:
 
 
 def _row_batches(csv_path: Path, mapping: dict[str, str], table: Table):
-    valid_columns = {name: table.columns[name] for name in table.columns.keys()}
+    valid_columns = {name: table.columns[name] for name in table.columns}
     unique_text_columns = [
-        name for name, col in valid_columns.items() if col.unique and str(col.type).startswith("VARCHAR")
+        name
+        for name, col in valid_columns.items()
+        if col.unique and str(col.type).startswith("VARCHAR")
     ]
 
     with csv_path.open(encoding="utf-8-sig", newline="") as fh:
@@ -172,7 +174,9 @@ def _row_batches(csv_path: Path, mapping: dict[str, str], table: Table):
 
             for column_name in unique_text_columns:
                 if isinstance(row.get(column_name), str):
-                    row[column_name] = _dedupe_unique_value(table.name, column_name, row[column_name])
+                    row[column_name] = _dedupe_unique_value(
+                        table.name, column_name, row[column_name]
+                    )
 
             batch.append(row)
             if len(batch) >= CHUNK_SIZE:
@@ -182,7 +186,9 @@ def _row_batches(csv_path: Path, mapping: dict[str, str], table: Table):
             yield batch
 
 
-async def _load_table(conn: AsyncConnection, table: Table, csv_path: Path, mapping: dict[str, str]) -> int:
+async def _load_table(
+    conn: AsyncConnection, table: Table, csv_path: Path, mapping: dict[str, str]
+) -> int:
     # ON CONFLICT DO NOTHING: alguns campos de texto colidem só depois da
     # limpeza de aspas (_unwrap_redundant_quotes) — ex: duas produtoras que
     # eram grafadas de forma diferente na base viram o mesmo nome depois de

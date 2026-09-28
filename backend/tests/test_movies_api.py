@@ -33,7 +33,10 @@ async def client():
 
     async with test_session_factory() as session:
         await create_admin(
-            session, nome="Admin Teste", email=TEST_ADMIN_EMAIL, senha_hash=hash_password(TEST_ADMIN_SENHA)
+            session,
+            nome="Admin Teste",
+            email=TEST_ADMIN_EMAIL,
+            senha_hash=hash_password(TEST_ADMIN_SENHA),
         )
 
     transport = ASGITransport(app=app)

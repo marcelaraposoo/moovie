@@ -22,7 +22,9 @@ _TOKEN_TTL_SECONDS = 60 * 60 * 12  # 12 horas
 
 def hash_password(password: str) -> str:
     salt = secrets.token_hex(16)
-    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), bytes.fromhex(salt), _PBKDF2_ITERATIONS)
+    digest = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), bytes.fromhex(salt), _PBKDF2_ITERATIONS
+    )
     return f"pbkdf2_sha256${_PBKDF2_ITERATIONS}${salt}${digest.hex()}"
 
 
@@ -35,7 +37,9 @@ def verify_password(password: str, hashed: str) -> bool:
     except (ValueError, AttributeError):
         return False
 
-    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), bytes.fromhex(salt), iterations)
+    digest = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), bytes.fromhex(salt), iterations
+    )
     return hmac.compare_digest(digest.hex(), expected_hex)
 
 
@@ -64,7 +68,9 @@ def verify_session_token(token: str) -> str | None:
         return None
 
     payload = f"{subject}:{expires_at}"
-    expected_signature = hmac.new(_signing_key(), payload.encode("utf-8"), hashlib.sha256).hexdigest()
+    expected_signature = hmac.new(
+        _signing_key(), payload.encode("utf-8"), hashlib.sha256
+    ).hexdigest()
     if not hmac.compare_digest(signature, expected_signature):
         return None
     if time.time() > expires_at:

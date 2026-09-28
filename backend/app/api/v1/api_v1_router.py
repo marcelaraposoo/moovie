@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 
 from app.auth.router import router as auth_router
-from app.movies.router import genres_router, router as movies_router
+from app.movies.router import genres_router
+from app.movies.router import router as movies_router
 
 api_router = APIRouter()
 

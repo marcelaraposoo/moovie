@@ -32,7 +32,9 @@ async def anonymous_client():
     app.dependency_overrides[get_db] = override_get_db
 
     async with test_session_factory() as session:
-        await create_admin(session, nome="Admin Teste", email=ADMIN_EMAIL, senha_hash=hash_password(ADMIN_SENHA))
+        await create_admin(
+            session, nome="Admin Teste", email=ADMIN_EMAIL, senha_hash=hash_password(ADMIN_SENHA)
+        )
 
     transport = ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as ac:
@@ -117,7 +119,9 @@ async def test_login_e_depois_me_funciona(anonymous_client: httpx.AsyncClient) -
 
 
 async def test_logout_invalida_a_sessao(anonymous_client: httpx.AsyncClient) -> None:
-    await anonymous_client.post("/api/v1/auth/login", json={"email": ADMIN_EMAIL, "senha": ADMIN_SENHA})
+    await anonymous_client.post(
+        "/api/v1/auth/login", json={"email": ADMIN_EMAIL, "senha": ADMIN_SENHA}
+    )
     logout_response = await anonymous_client.post("/api/v1/auth/logout")
     assert logout_response.status_code == 204
 

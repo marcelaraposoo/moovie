@@ -52,7 +52,11 @@ async def list_movies(
     )
 
 
-@router.get("/{sk_movie_id}", response_model=MovieDetail, summary="Detalhes de um filme e suas avaliações")
+@router.get(
+    "/{sk_movie_id}",
+    response_model=MovieDetail,
+    summary="Detalhes de um filme e suas avaliações",
+)
 async def get_movie(sk_movie_id: str, db: AsyncSession = Depends(get_db)) -> MovieDetail:
     movie = await _get_movie_or_404(db, sk_movie_id)
     return MovieDetail.model_validate(service.to_detail(movie))

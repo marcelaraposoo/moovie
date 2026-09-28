@@ -46,8 +46,12 @@ def to_list_item(movie: DimMovie) -> dict:
         "url_backdrop": movie.url_backdrop,
         "generos": [g.nome_genero for g in movie.genres],
         "diretor": _director_name(movie),
-        "nota_media": movie.reviews_summary.nota_media_usuarios if movie.reviews_summary else None,
-        "qtd_avaliacoes": movie.reviews_summary.qtd_avaliacoes_usuarios if movie.reviews_summary else 0,
+        "nota_media": (
+            movie.reviews_summary.nota_media_usuarios if movie.reviews_summary else None
+        ),
+        "qtd_avaliacoes": (
+            movie.reviews_summary.qtd_avaliacoes_usuarios if movie.reviews_summary else 0
+        ),
     }
 
 
