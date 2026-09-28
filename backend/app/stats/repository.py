@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from sqlalchemy import func, select
+from sqlalchemy import Integer, cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.movies.models import DimGenre, DimMovie, MovieReview, bridge_movie_genre
@@ -37,7 +37,9 @@ async def top_genres(db: AsyncSession, *, limit: int = 8) -> list[tuple[str, int
 
 
 async def movies_by_decade(db: AsyncSession) -> list[tuple[int, int]]:
-    decada = (DimMovie.ano_lancamento / 10) * 10
+    # cast para inteiro: o SQLAlchemy 2 faz `/` como divisão decimal, então
+    # sem o CAST 2021 viraria 2021.0 (e não 2020) ao multiplicar por 10.
+    decada = cast(DimMovie.ano_lancamento / 10, Integer) * 10
     stmt = (
         select(decada.label("decada"), func.count())
         .where(DimMovie.ano_lancamento.isnot(None))
