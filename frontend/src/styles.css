@@ -923,3 +923,44 @@ body {
   min-width: 3.5ch;
   text-align: right;
 }
+
+.dashboard-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.dashboard-panel-header h2 {
+  margin: 0;
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.segmented-option {
+  background: transparent;
+  color: var(--ink-muted);
+  border: none;
+  padding: 0.3rem 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.segmented-option-active {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.dashboard-note {
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  margin: 1rem 0 0;
+}

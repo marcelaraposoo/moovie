@@ -2,6 +2,11 @@ import { useEffect, useState } from "react";
 import { extractErrorMessage, fetchDashboard } from "../api/client";
 import type { DashboardStats } from "../types/movie";
 
+type Granularidade = "ano" | "decada";
+
+// acima disso, o gráfico por ano fica ilegível: mostramos só os mais recentes
+const MAX_ANOS = 30;
+
 interface BarRow {
   label: string;
   value: number;
@@ -33,6 +38,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [granularidade, setGranularidade] = useState<Granularidade>("ano");
 
   useEffect(() => {
     fetchDashboard()
@@ -44,6 +50,13 @@ export default function DashboardPage() {
   if (loading) return <p className="loading-state">Carregando estatísticas...</p>;
   if (error) return <p className="form-error">{error}</p>;
   if (!stats) return null;
+
+  const anosVisiveis = stats.filmes_por_ano.slice(-MAX_ANOS);
+  const anosOcultos = stats.filmes_por_ano.length - anosVisiveis.length;
+  const rowsPorPeriodo: BarRow[] =
+    granularidade === "ano"
+      ? anosVisiveis.map((a) => ({ label: String(a.ano), value: a.quantidade }))
+      : stats.filmes_por_decada.map((d) => ({ label: `${d.decada}s`, value: d.quantidade }));
 
   return (
     <section className="dashboard-page">
@@ -77,14 +90,31 @@ export default function DashboardPage() {
         </div>
 
         <div className="dashboard-panel">
-          <h2>Filmes por década</h2>
-          <BarChart
-            emptyText="Ainda não há filmes com ano de lançamento."
-            rows={stats.filmes_por_decada.map((d) => ({
-              label: `${d.decada}s`,
-              value: d.quantidade,
-            }))}
-          />
+          <div className="dashboard-panel-header">
+            <h2>{granularidade === "ano" ? "Filmes por ano" : "Filmes por década"}</h2>
+            <div className="segmented" role="group" aria-label="Agrupar filmes por">
+              <button
+                type="button"
+                className={`segmented-option ${granularidade === "ano" ? "segmented-option-active" : ""}`}
+                aria-pressed={granularidade === "ano"}
+                onClick={() => setGranularidade("ano")}
+              >
+                Ano
+              </button>
+              <button
+                type="button"
+                className={`segmented-option ${granularidade === "decada" ? "segmented-option-active" : ""}`}
+                aria-pressed={granularidade === "decada"}
+                onClick={() => setGranularidade("decada")}
+              >
+                Década
+              </button>
+            </div>
+          </div>
+          <BarChart emptyText="Ainda não há filmes com ano de lançamento." rows={rowsPorPeriodo} />
+          {granularidade === "ano" && anosOcultos > 0 && (
+            <p className="dashboard-note">Mostrando os {MAX_ANOS} anos mais recentes.</p>
+          )}
         </div>
       </div>
     </section>

@@ -49,6 +49,11 @@ export interface GenreCount {
   quantidade: number;
 }
 
+export interface YearCount {
+  ano: number;
+  quantidade: number;
+}
+
 export interface DecadeCount {
   decada: number;
   quantidade: number;
@@ -59,6 +64,7 @@ export interface DashboardStats {
   total_avaliacoes: number;
   nota_media_geral: number | null;
   generos_mais_comuns: GenreCount[];
+  filmes_por_ano: YearCount[];
   filmes_por_decada: DecadeCount[];
 }
 
