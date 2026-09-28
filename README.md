@@ -1,4 +1,4 @@
-# 🐄 Moovie
+# 🐄 🎥 Moovie
 
 Catálogo e avaliação de filmes, inspirado no Letterboxd. Navegue por milhares de filmes, busque por título ou gênero, leia e escreva avaliações. O Administrador gerencia o catálogo.
 
