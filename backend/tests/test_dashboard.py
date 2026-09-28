@@ -53,6 +53,9 @@ async def test_dashboard_com_dados(client: httpx.AsyncClient) -> None:
     assert generos["Ficção Científica"] == 2
     assert generos["Ação"] == 1
 
+    anos = {a["ano"]: a["quantidade"] for a in body["filmes_por_ano"]}
+    assert anos == {1999: 1, 2021: 1}
+
     decadas = {d["decada"]: d["quantidade"] for d in body["filmes_por_decada"]}
     assert decadas[2020] == 1
     assert decadas[1990] == 1
@@ -66,4 +69,5 @@ async def test_dashboard_sem_nenhum_filme(client: httpx.AsyncClient) -> None:
     assert body["total_avaliacoes"] == 0
     assert body["nota_media_geral"] is None
     assert body["generos_mais_comuns"] == []
+    assert body["filmes_por_ano"] == []
     assert body["filmes_por_decada"] == []

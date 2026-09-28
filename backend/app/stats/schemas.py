@@ -8,6 +8,11 @@ class GenreCount(BaseModel):
     quantidade: int
 
 
+class YearCount(BaseModel):
+    ano: int
+    quantidade: int
+
+
 class DecadeCount(BaseModel):
     decada: int
     quantidade: int
@@ -18,4 +23,5 @@ class DashboardStats(BaseModel):
     total_avaliacoes: int
     nota_media_geral: float | None
     generos_mais_comuns: list[GenreCount]
+    filmes_por_ano: list[YearCount]
     filmes_por_decada: list[DecadeCount]

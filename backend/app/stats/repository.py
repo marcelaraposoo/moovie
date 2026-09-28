@@ -36,6 +36,17 @@ async def top_genres(db: AsyncSession, *, limit: int = 8) -> list[tuple[str, int
     return [(nome, qtd) for nome, qtd in result.all()]
 
 
+async def movies_by_year(db: AsyncSession) -> list[tuple[int, int]]:
+    stmt = (
+        select(DimMovie.ano_lancamento, func.count())
+        .where(DimMovie.ano_lancamento.isnot(None))
+        .group_by(DimMovie.ano_lancamento)
+        .order_by(DimMovie.ano_lancamento)
+    )
+    result = await db.execute(stmt)
+    return [(int(ano), qtd) for ano, qtd in result.all()]
+
+
 async def movies_by_decade(db: AsyncSession) -> list[tuple[int, int]]:
     # cast para inteiro: o SQLAlchemy 2 faz `/` como divisão decimal, então
     # sem o CAST 2021 viraria 2021.0 (e não 2020) ao multiplicar por 10.
