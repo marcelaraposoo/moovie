@@ -3,6 +3,15 @@ from app.movies import models  # noqa: F401  Registra os modelos ORM.
 
 
 def test_movie_schema_registers_expected_tables() -> None:
+    """As 10 tabelas do schema estrela original devem continuar intactas.
+
+    Usamos "é subconjunto de" (<=), não "é igual a" (==), de propósito: o
+    módulo de autenticação (bônus) registra a tabela adicional
+    `admin_users` no mesmo Base.metadata, e isso é esperado — o que este
+    teste garante é que o schema *fornecido pela atividade* não foi alterado
+    ou perdido, não que nada mais possa ser adicionado por cima dele.
+    """
+
     expected_tables = {
         "bridge_movie_company",
         "bridge_movie_genre",
@@ -16,7 +25,7 @@ def test_movie_schema_registers_expected_tables() -> None:
         "movie_reviews",
     }
 
-    assert set(Base.metadata.tables) == expected_tables
+    assert expected_tables <= set(Base.metadata.tables)
     assert "idioma_original" not in Base.metadata.tables["dim_movies"].columns
 
 
